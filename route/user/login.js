@@ -63,7 +63,7 @@ async function handleUserMatch(data, user, createJWT, res) {
             name: user.name,
             email: data.email
         });
-        res.status(200).json({ token });
+        res.status(200).json({ token, userName: user.name });
     } catch(error) {
         handleInternalError(
             { data, user },
