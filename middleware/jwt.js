@@ -7,7 +7,7 @@ function addJWT(secret) {
     };
 
     return (req, _res, next) => {
-        req.jwt = jwt;
+        req.appShared.jwt = jwt;
         next();
     };
 }

@@ -1,6 +1,6 @@
 function useDB(db) {
     return (req, _res, next) => {
-        req.db = db;
+        req.appShared.db = db;
         next();
     };
 }

@@ -9,7 +9,7 @@ function login(req, res) {
     if(!validationResult.valid) {
         handleError(res, validationResult);
     } else {
-        handleOrganizationManager(data, req.db, req.jwt.create, res);
+        handleOrganizationManager(data, req.appShared.db, req.appShared.jwt.create, res);
     }
 }
 
@@ -20,21 +20,17 @@ async function handleOrganizationManager(data, db, createJWT, res) {
             projection: {
                 _id: true,
                 name: true,
+                checksum: true,
                 passwordSHash: true
             }
         });
         if(user) {
             handleUser(data, user, createJWT, res);
         } else {
-            handleError(res, { reason: 'couldNotLogin' });
+            handleError(res, { failedTo: 'signIn' });
         }
     } catch(error) {
-        handleInternalError(
-            { data },
-            error,
-            '[mongodb] Failed to check if user exists',
-            res, { reason: 'checkUser' }
-        );
+        handleInternalError({ data }, error, '[mongodb] Failed to check if user exists', res, 'checkUser');
     }
 }
 
@@ -44,15 +40,10 @@ async function handleUser(data, user, createJWT, res) {
         if(passwordMatch) {
             handleUserMatch(data, user, createJWT, res);
         } else {
-            handleError(res, { reason: 'couldNotLogin' });
+            handleError(res, { failedTo: 'signIn' });
         }
     } catch(error) {
-        handleInternalError(
-            { data, user },
-            error,
-            '[bcrypt] Failed to check if password matches',
-            res, { reason: 'checkUser' }
-        );
+        handleInternalError({ data, user }, error, '[bcrypt] Failed to check if password matches', res, 'checkUser');
     }
 }
 
@@ -61,16 +52,12 @@ async function handleUserMatch(data, user, createJWT, res) {
         const token = await createJWT({
             _id: user._id.toString(),
             name: user.name,
-            email: data.email
+            email: data.email,
+            checksum: user.checksum
         });
         res.status(200).json({ token, userName: user.name });
     } catch(error) {
-        handleInternalError(
-            { data, user },
-            error,
-            '[jwt] Failed to generate JWT',
-            res, { reason: 'generateJWT' }
-        );
+        handleInternalError({ data, user }, error, '[jwt] Failed to generate JWT', res, 'generateJWT');
     }
 }
 

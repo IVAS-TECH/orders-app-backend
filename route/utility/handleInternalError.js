@@ -1,4 +1,4 @@
-function handleInternalError(logInfo, { name, message }, logMessage, res, resError) {
+function handleInternalError(logInfo, { name, message }, logMessage, res, reason) {
     const logInfo = {
         data,
         error: {
@@ -14,7 +14,7 @@ function handleInternalError(logInfo, { name, message }, logMessage, res, resErr
         time: new Date().toISOString()
     });
     if(res) {
-        res.status(500).json({ error: resError });
+        res.status(500).json({ error: { reason } });
     }
 }
 

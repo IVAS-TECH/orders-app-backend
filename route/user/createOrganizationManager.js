@@ -10,11 +10,11 @@ function createOrganizationManager(req, res) {
     if(!validationResult.valid) {
         handleError(res, validationResult);
     } else {
-        handleOrganizationManager(data, req.db, res);
+        handleOrganizationManager(data, req.appShared.db, req.appShared.checksumSecret, res);
     }
 }
 
-async function handleOrganizationManager(data, db, res) {
+async function handleOrganizationManager(data, db, checksumSecret, res) {
     try {
         const organizationCollection = db.collection('organization');
         const organization = await organizationCollection.findOne({ name: data.organization });
@@ -27,28 +27,18 @@ async function handleOrganizationManager(data, db, res) {
                 if(user) {
                     handleError(res, { userExists: data.email });
                 } else {
-                    createOrganizationAndUser(data, db, res);
+                    createOrganizationAndUser(data, db, checksumSecret, res);
                 }
             } catch(error) {
-                handleInternalError(
-                    { data },
-                    error,
-                    '[mongodb] Failed to check if user exists',
-                    res, { reason: 'checkUser' }
-                );
+                handleInternalError({ data }, error, '[mongodb] Failed to check if user exists', res, 'checkUser');
             }
         }
     } catch(error) {
-        handleInternalError(
-            { data },
-            error,
-            '[mongodb] Failed to check if organization exists',
-            res, { reason: 'checkOrganization' }
-        );
+        handleInternalError({ data }, error, '[mongodb] Failed to check if organization exists', res, 'checkOrganization');
     }
 }
 
-async function createOrganizationAndUser(data, db, res) {
+async function createOrganizationAndUser(data, db, checksumSecret, res) {
     const userID = new mongodb.ObjectID();
     const organizationID = new mongodb.ObjectID();
     const organizationCollection = db.collection('organization');
@@ -63,14 +53,9 @@ async function createOrganizationAndUser(data, db, res) {
             userID,
             organizationID,
             data
-        }, db, res);
+        }, db, checksumSecret, res);
     } catch(error) {
-        handleInternalError(
-            { organizationDocument, data },
-            error,
-            '[mongodb] Failed to create organization',
-            res, { reason: 'createOrganization' }
-        );
+        handleInternalError({ organizationDocument, data }, error, '[mongodb] Failed to create organization', res, 'createOrganization');
     }
 }
 
@@ -78,7 +63,7 @@ async function handleUserCreation({
     userID,
     organizationID,
     data
-}, db, res) {
+}, db, checksumSecret, res) {
     const documentData = {
         userID,
         organizationID,
@@ -88,7 +73,7 @@ async function handleUserCreation({
         phone: data.phone
     };
     try {
-        const userDocument = await generateUserDocument(documentData);
+        const userDocument = await generateUserDocument(documentData, checksumSecret);
         try {
             const userCollection = db.collection('user');
             const _inserted = await userCollection.insertOne(userDocument);
@@ -114,7 +99,7 @@ async function handleUserCreationError({
     error,
     logMessage
 }, res) {
-    handleInternalError({ documentData }, error, logMessage, res, { reason: 'createUser' });
+    handleInternalError({ documentData }, error, logMessage, res, 'createUser');
 
     try {
         const organizationCollection = db.collection('organization');

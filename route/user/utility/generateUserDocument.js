@@ -1,24 +1,20 @@
 const encryptPassword = require('./encryptPassword');
+const generateChecksum = require('./generateChecksum');
 
-function generateUserDocument({
-    userID,
-    organizationID,
-    userName,
-    email,
-    password,
-    phone
-}) {
+function generateUserDocument(data, checksumSecret) {
     return new Promise(async (resolve, reject) => {
         try {
-            const { salt, hash } = await encryptPassword(password);
+            const { salt, hash } = await encryptPassword(data.password);
+            const checksum = generateChecksum(data, checksumSecret);
             resolve({
-                _id: userID,
-                organizationID,
-                name: userName,
-                email,
+                _id: data.userID,
+                organizationID: data.organizationID,
+                name: data.userName,
+                email: data.email,
                 passwordSalt: salt,
                 passwordSHash: hash,
-                phone
+                phone: data.phone,
+                checksum
             });
         } catch (err) {
             reject(errr);
