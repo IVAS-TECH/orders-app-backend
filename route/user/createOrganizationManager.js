@@ -25,7 +25,7 @@ async function handleOrganizationManager(data, db, checksumSecret, res) {
                 const userCollection = db.collection('user');
                 const user = await userCollection.findOne({ email: data.email });
                 if(user) {
-                    handleError(res, { userExists: data.email });
+                    handleError(res, { userWithThisEmailExists: data.email });
                 } else {
                     createOrganizationAndUser(data, db, checksumSecret, res);
                 }
