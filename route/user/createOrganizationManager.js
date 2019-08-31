@@ -49,11 +49,7 @@ async function createOrganizationAndUser(data, db, checksumSecret, res) {
     };
     try {
         const _organization = await organizationCollection.insertOne(organizationDocument);
-        handleUserCreation({
-            userID,
-            organizationID,
-            data
-        }, db, checksumSecret, res);
+        handleUserCreation({ userID, organizationID, data }, db, checksumSecret, res);
     } catch(error) {
         handleInternalError({ organizationDocument, data }, error, '[mongodb] Failed to create organization', res, 'createOrganization');
     }
@@ -70,7 +66,8 @@ async function handleUserCreation({
         userName: data.userName,
         email: data.email,
         password: data.password,
-        phone: data.phone
+        phone: data.phone,
+        role: 'organizationManager'
     };
     try {
         const userDocument = await generateUserDocument(documentData, checksumSecret);
@@ -79,18 +76,10 @@ async function handleUserCreation({
             const _inserted = await userCollection.insertOne(userDocument);
             res.status(200).json({ result: 'createdOrganizationManager' });
         } catch(error) {
-            handleUserCreationError({
-                documentData,
-                error,
-                logMessage: '[mongodb] Failed to create user'
-            }, res);
+            handleUserCreationError({ documentData, error, logMessage: '[mongodb] Failed to create user' }, res);
         }
     } catch(error) {
-        handleUserCreationError({
-            documentData,
-            error,
-            logMessage: '[bcrypt] Failed to salt/hash password'
-        }, res);
+        handleUserCreationError({ documentData, error, logMessage: '[bcrypt] Failed to salt/hash password' }, res);
     }
 }
 
@@ -100,7 +89,6 @@ async function handleUserCreationError({
     logMessage
 }, res) {
     handleInternalError({ documentData }, error, logMessage, res, 'createUser');
-
     try {
         const organizationCollection = db.collection('organization');
         const _result = await organizationCollection.deleteOne({ _id: organizationID});

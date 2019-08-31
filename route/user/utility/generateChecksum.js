@@ -6,7 +6,8 @@ function generateChecksum({
     userName,
     email,
     password,
-    phone
+    phone,
+    role,
 }, checksumSecret) {
     const hash = crypto.createHash('sha256');
     hash.update(userID.toString());
@@ -15,6 +16,7 @@ function generateChecksum({
     hash.update(email);
     hash.update(password);
     hash.update(phone);
+    hash.update(role);
     hash.update(checksumSecret);
     return hash.digest('hex');
 }

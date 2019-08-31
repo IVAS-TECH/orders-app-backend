@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/IVAS-TECH/orders-app-backend#readme",
   "dependencies": {
+    "base64url": "^3.0.1",
     "bcrypt": "^3.0.6",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",

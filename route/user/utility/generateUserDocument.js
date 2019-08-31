@@ -14,6 +14,7 @@ function generateUserDocument(data, checksumSecret) {
                 passwordSalt: salt,
                 passwordSHash: hash,
                 phone: data.phone,
+                role: data.role,
                 checksum
             });
         } catch (err) {
