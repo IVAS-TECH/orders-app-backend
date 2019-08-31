@@ -17,24 +17,24 @@ async function register(req, res) {
         return;
     }
     if(!isOrganizationInfo(organization)) {
-        handleError(res, { invalidOrganizationInfo: true });
+        handleError(res, { invalidOrganizationToken: true });
         return;
     }
     const jwtToken = base64URL.decode(organization);
     if(!isJWT(jwtToken)) {
-        handleError(res, { invalidJWT: true });
+        handleError(res, { invalidOrganizationToken: true });
         return;
     }
     try {
         const { id } = await req.appShared.jwt.decode(jwtToken);
         if(!isObjectId(id)) {
-            handleError(res, { decodedTokenDoesNotIncludeValidId: true });
+            handleError(res, { invalidOrganizationToken: true });
             return;
         }
         const organizationID = new mongodb.ObjectID(id);
         handleRegister(data, req.appShared.db, organizationID, req.appShared.checksumSecret, res);
     } catch(error) {
-        handleError(res, { invalidJWT: true });
+        handleError(res, { invalidOrganizationToken: true });
     }
 }
 
@@ -45,7 +45,7 @@ async function handleRegister(data, db, organizationID, checksumSecret, res) {
         if(organization) {
             handleRegisterUser(data, organizationID, db, checksumSecret, res);
         } else {
-            handleError(res, { organizationDoesNotExist: true });
+            handleError(res, { invalidOrganizationToken: true });
         }
     } catch(error) {
         handleInternalError({ organizationID }, error, '[mongodb] Failed to check if organization exists', res, 'checkOrganization');
