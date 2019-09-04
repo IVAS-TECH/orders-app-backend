@@ -73,6 +73,7 @@ async function handleData(orderData, fileData, user, db, res) {
     const fileDocument = {
         _id: fileID,
         orderID,
+        organizationID: user.organizationID,
         ...fileData
     };
     const orderDocument = {
@@ -81,7 +82,8 @@ async function handleData(orderData, fileData, user, db, res) {
         ...orderData,
         userID: user._id,
         organizationID: user.organizationID,
-        date: new Date()
+        date: new Date(),
+        status: 'waiting'
     };
     try {
         const orderCollection = db.collection('order');
