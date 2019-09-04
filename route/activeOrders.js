@@ -16,7 +16,7 @@ async function sendActiveOrders(nameMap, req, res) {
         status: { $in: ['waiting', 'accepted', 'processing', 'ready'] }
     };
     const options = {
-        projection: { _id: true, userID: true, date: true, fileName: true, status: true }
+        projection: { _id: true, userID: true, date: true, fileName: true, fileID: true, status: true }
     };
     const orderCollection = req.appShared.db.collection('order');
     try {
@@ -24,7 +24,10 @@ async function sendActiveOrders(nameMap, req, res) {
             id: order._id,
             orderedBy: nameMap[order.userID],
             date: order.date.toISOString(),
-            file: order.fileName,
+            file: {
+                name: order.fileName,
+                id: order.fileID.toString()
+            },
             status: order.status
         })).toArray();
         res.status(200).json({ activeOrders: orders });
