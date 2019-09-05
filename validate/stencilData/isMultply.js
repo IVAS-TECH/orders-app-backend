@@ -4,7 +4,7 @@ const validate = require('./../validate');
 
 const isMultiplyOnAxis = validatorFromValidate(validateIsMultiplyOnAxis);
 
-const isMultply = validateIsMultiplyOnAxis(validate({
+const isMultply = validatorFromValidate(validate({
     x: isMultiplyOnAxis,
     y: isMultiplyOnAxis
 }));

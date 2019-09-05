@@ -3,7 +3,7 @@ const isNatural = require('./../../validator/isNatural');
 const validate = require('./../validate');
 
 const isMultiplyOnAxis = validate({
-    count: isCount,
+    panelsCount: isCount,
     step: isNatural
 });
 
