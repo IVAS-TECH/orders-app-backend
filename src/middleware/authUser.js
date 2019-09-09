@@ -1,7 +1,7 @@
 const mongodb = require('mongodb');
-const isJWT = require('./../validator/isJWT');
-const isString = require('./../validator/isString');
-const handleError = require('./../route/utility/handleError');
+const isJWT = require('../validator/isJWT');
+const isString = require('../validator/isString');
+const handleError = require('../route/utility/handleError');
 
 const tokenRegEx = /Bearer (.+)/;
 

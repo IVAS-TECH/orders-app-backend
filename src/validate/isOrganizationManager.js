@@ -1,7 +1,7 @@
 const isOrganizatioName = require('../validator/isOrganizationName');
 const isEmail = require('../validator/isEmail');
 const isMobilePhone = require('../validator/isMobilePhone');
-const isPassword = require('./../validator/isPassword');
+const isPassword = require('../validator/isPassword');
 const isUserName = require('../validator/isUserName');
 const validate = require('./validate');
 
