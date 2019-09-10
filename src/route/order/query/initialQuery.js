@@ -28,7 +28,7 @@ async function initalQuery(req, res) {
         ]);
         res.status(200).json({ count, orders });
     } catch(error) {
-        handleInternalError({ id, user: req.user }, error, '[mongodb] Failed to find order', res, 'fechOrder');
+        handleInternalError({ data, user: req.user, query }, error, '[mongodb] Failed to find orders', res, 'initailOrderQuery');
     }
 }
 
