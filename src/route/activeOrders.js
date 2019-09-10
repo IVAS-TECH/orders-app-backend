@@ -1,5 +1,6 @@
 const organizationMembersNameMap = require('./../dbQuery/organizationMembersNameMap');
 const handleInternallError = require('./utility/handleInternalError');
+const ordersInfo = require('./../dbQuery/ordersInfo');
 
 async function activeOrders(req, res) {
     try {
@@ -15,21 +16,8 @@ async function sendActiveOrders(nameMap, req, res) {
         organizationID: req.user.organizationID,
         status: { $in: ['waiting', 'accepted', 'processing', 'ready'] }
     };
-    const options = {
-        projection: { _id: true, userID: true, date: true, fileName: true, fileID: true, status: true }
-    };
-    const orderCollection = req.appShared.db.collection('order');
     try {
-        const orders = await orderCollection.find(query, options).map(order => ({
-            id: order._id,
-            orderedBy: nameMap[order.userID],
-            date: order.date.toISOString(),
-            file: {
-                name: order.fileName,
-                id: order.fileID.toString()
-            },
-            status: order.status
-        })).toArray();
+        const orders = await ordersInfo(req.appShared.db, query, { }, nameMap);
         res.status(200).json({ activeOrders: orders });
     } catch(error) {
         handleInternallError({ user: req.user, query }, error, '[mongodb] call organizationMembersNameMap', res, 'findActiveOrders');

@@ -5,7 +5,7 @@ const orderStatus = [
     'accepted',
     'rejected',
     'canceled',
-    'procssing',
+    'processing',
     'ready',
     'delivered'
 ];

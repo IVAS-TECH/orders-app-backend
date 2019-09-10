@@ -9,9 +9,9 @@ const validate = require('./validate');
 const isOrderQuery = validate({
     startDate: isISODate,
     endDate: isISODate,
-    status: isArrayOf(isOrderStatus.validate, isOrderStatus.orderStatus),
+    status: isArrayOf(isOrderStatus.validate, isOrderStatus.orderStatus.length),
     orderedBy: isArrayOf(isObjectId),
-    fileExtention: isArrayOf(isArchiveFileExtention.validate, isArchiveFileExtention.archiveFileExtention),
+    fileExtention: isArrayOf(isArchiveFileExtention.validate, isArchiveFileExtention.archiveFileExtention.length),
     fileName: val => isString(val) && (val.length < 256)
 });
 
