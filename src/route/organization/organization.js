@@ -1,26 +1,31 @@
 const handleInternalError = require('./../utility/handleInternalError');
 
 async function organization(req, res) {
-    const userCollection = req.appShared.db.collection('user');
+    const db = req.appShared.db;
+    const organizationCollection = db.collection('organization');
+    const userCollection = db.collection('user');
     const { organizationID } = req.user;
-    const query = { organizationID };
-    const options = { projection: { name: true, email: true, phone: true, role: true } };
+    const userOptions = { projection: { _id: true, name: true, email: true, phone: true } };
     try {
-        const members = await userCollection.find(query, options).toArray();
-        const manager = members.find(({ role }) => role === 'organizationManager');
+        const [ organization, members ] = await Promise.all([
+            organizationCollection.findOne({ _id: organizationID }),
+            userCollection.find({ organizationID }, userOptions).toArray()
+        ]);
+        const manager = members.find(({ _id }) => _id.equals(organization.managerID));
         const users = members.filter(member => member != manager);
         res.status(200).json({
             organization: {
-                manager: removeRole(manager),
-                users: users.map(removeRole)
+                name: organization.name,
+                manager: removeId(manager),
+                users: users.map(removeId)
             }
         });
     } catch(error) { 
-        handleInternalError({ query }, error, '[mongodb] Failed to find users', res, 'findUsers');
+        handleInternalError({ user: req.user }, error, '[mongodb] Failed to find organization data', res, 'findOrganizationData');
     }
 }
 
-function removeRole({ role, ...user }) {
+function removeId({ _id, ...user }) {
     return user;
 }
 
