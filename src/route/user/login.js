@@ -9,11 +9,11 @@ function login(req, res) {
     if(!validationResult.valid) {
         handleError(res, validationResult);
     } else {
-        handleOrganizationManager(data, req.appShared.db, req.appShared.jwt.create, res);
+        handleLogin(data, req.appShared.db, req.appShared.jwt.create, res);
     }
 }
 
-async function handleOrganizationManager(data, db, createJWT, res) {
+async function handleLogin(data, db, createJWT, res) {
     try {
         const userCollection = db.collection('user');
         const user = await userCollection.findOne({ email: data.email }, {
@@ -21,7 +21,8 @@ async function handleOrganizationManager(data, db, createJWT, res) {
                 _id: true,
                 name: true,
                 checksum: true,
-                passwordSHash: true
+                passwordSHash: true,
+                role: true
             }
         });
         if(user) {
@@ -55,7 +56,7 @@ async function handleUserMatch(data, user, createJWT, res) {
             email: data.email,
             checksum: user.checksum
         });
-        res.status(200).json({ token, userName: user.name });
+        res.status(200).json({ token, userName: user.name, userRole: user.role });
     } catch(error) {
         handleInternalError({ data, user }, error, '[jwt] Failed to generate JWT', res, 'generateJWT');
     }
