@@ -18,7 +18,7 @@ async function dev() {
         });
         console.log(`server listening on port: http://${host}:${port}`);
     } catch(error) {
-        console.log(error.message);
+        console.log(`PANIC: ${error.message}`);
     }
 }
 

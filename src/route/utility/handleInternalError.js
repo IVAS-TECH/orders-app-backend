@@ -1,4 +1,4 @@
-function handleInternalError(logInfo, { name, message }, logMessage, res, reason) {
+function handleInternalError(data, { name, message }, logMessage, res, reason) {
     const logInfo = {
         data,
         error: {
